@@ -1,0 +1,18 @@
+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
+
+--------------------------------------------------
+    ftp&DB
+anashalw_ftp / anashalw_db
+IZ*x0LxS
+
+anashalw
+rUsktEyK
+
+ssh anashalw@anashalw.beget.tech
+ssh localhost -p 222
+
+--------------------------------------------------
+/home/a/anashalw/anashalw.beget.tech/public_html/wp-content/themes/CustomTheme/vue-vite-ssr
+
+#!/bin/bash
+/usr/bin/expect -c 'expect "\n" { eval spawn ssh -oStrictHostKeyChecking=no -oCheckHostIP=no anashalw@anashalw.beget.tech; interact }'

@@ -1,0 +1,69 @@
+{{NODE}} (if error install)
+    curl -fsSL <link>
+    sudo dpkg -i --force-overwrite /var/cache/apt/archives/<archive-name>
+    sudo apt -f install
+    sudo apt update
+    sudo apt dist-upgrade
+
+{{NODE}} (install to hosting in docker-ubuntu)
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
+        **OR**
+    wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
+
+    export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    
+    nvm install <NODE_V>
+    nvm use <NODE_V>
+
+        ***if bin/node which another path***
+        change ~/.bashrc like:
+            PATH=/home/a/anashalw/.nvm/versions/node/v16.18.1/bin/node:$PATH
+
+
+
+{{NODE dockerfile}}
+    (1)
+        RUN apt-get update && apt-get install -y \
+            software-properties-common \    
+            npm
+        RUN npm install npm@latest -g && \
+            npm install n -g && \   
+            n latest   
+
+    (2) 
+        ENV NODE_VERSION=16.13.0
+        RUN apt install -y curl
+        RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+        ENV NVM_DIR=/root/.nvm
+        RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION}
+        RUN . "$NVM_DIR/nvm.sh" && nvm use v${NODE_VERSION}
+        RUN . "$NVM_DIR/nvm.sh" && nvm alias default v${NODE_VERSION}
+        ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
+        RUN node --version
+        RUN npm --version 
+
+
+==============================={{{{{{{{{{{{{{{{{{{{{UTILITES}}}}}}}}}}}}}}}}}}}}}]=================================================================
+BASH SCRIPT COMMAND
+
+Only you - $HOME/.local/bin (As per the XDG Base Directory Specification)
+You and other local users - /usr/local/bin
+root only - /usr/local/sbin
+
+example:
+    #!/usr/bin/expect
+
+    set timeout 20
+
+    set cmd [lrange $argv 1 end]
+    set password [lindex $argv 0]
+
+    eval spawn $cmd
+    expect "password:"
+    send "$password\r";
+    interact
+    Put it to /usr/bin/exp, So you can use:
+
+    exp <password> ssh <anything>
+    exp <password> scp <anysrc> <anydst>

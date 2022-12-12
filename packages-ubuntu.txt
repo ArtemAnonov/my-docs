@@ -1,0 +1,4 @@
+sudo dpkg -i --force-overwrite /var/cache/apt/archives/<ARHIVENAME>
+sudo apt -f install
+sudo apt update
+sudo apt dist-upgrade

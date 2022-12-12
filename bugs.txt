@@ -1,0 +1,301 @@
+
+Проблемы с путями файлов
+--- в открытом файле в vscode переключить с CRLF на LF (windows: CR & LF; unix: LF)
+
+TO DO LIST ДЛЯ ПРОДАКШЕНА:
+ x (включить проверку nonce в AbstractCartRoute)
+ - CORS
+
+//////////////////////////////////////////////////////////////////////////////////
+BACKEND
+//////////////////////////////////////////////////////////////////////////////////
+
+[]
+Перенос на хостинг:
+ - перенос db из mysql docker:
+    - команда для контенера mysql docker exec 19529d9fd8f9 /usr/bin/mysqldump -u MYSQL_USER --password=MYSQL_PASSWORD --no-tablespaces  wp_db > wp_db.sql
+    !- импорт в php-my-admin - возможно нужно установить кодировку utf16
+ - установка в wp-settigs.php:
+    - DB_HOST - localhost
+
+
+
+
+
+XDEBUG - ошибка подключения, связанная с тем, что php-fpm имеет директиву clear_env,
+которую нужно выключить (я сделал это в .env, главном для wordpress контейнера):
+clear_env=off
+---------------------------------------------------------------------------------------
+
+
+---------------------------------------------------------------------------------------
+
+Не подключается класс composer-ом:
+    1) Проверить иерархию папок, чтобы было соответствие
+    2) Переустановить vendor
+---------------------------------------------------------------------------------------
+
+Ошибка подключения к db вордпресса после установки новой версии.
+Вместо установки констант в .env установил в wp-config.php (примечание: из коробки
+докер-вордпресс имеет wp-config-example.php стандартную настройку, я поставил ту, в которойпроисходит переопределение docker_env
+но и это не помогло. Поэтому поставил мои данные как дефолтные) 
+
+
+Отключение CORS в Хроме - использование Attach с флагом в ярлыке Хрома: --disable-web-security
+
+{{PHP}}
+    [cURL] 
+    В wordpress docker вызов php curl из пакета automattic/woocommerce приводил
+    к ошибкам. Connection refused, timeout etc. 
+    Ошибки возникали в файле functions.php. Вызов в клиентском классе решил проблему
+
+{{PHPMyAdmin}}
+    - Ошибка
+        Необходимо увеличить размер возможных занружаемых файлов. Это желательно сделать в environment
+    - Ошибка: "Network error"
+        Установка свежей версии PMA
+
+{{WORDPRESS}}
+    Error include styles (admin panel)
+        db/options/siteurl: http://<siteurl>/
+
+
+    {{WOOCOMMERCE}}
+        401 error woocomerce:
+        ошибка из-за неправильного хоста в админке wordpress - изменил с //localhost на http://localhost 
+        usr/local/etc/php-fpm.d/www.conf
+
+        подключение стилей и скриптов:
+            пути, которые использутся при навигации в каталоге файлов и для подключения файло разные
+            - для фалового дерева (например для поиска и подклюючения файлов) используются такие функции как 
+            get_stylesheet_directory() (путь получится: http://example.com/var/wwww/html/wp-content/themes/my-theme/my-theme-script.js.) и ей подобные
+            - для подключения файлов - get_template_directory_uri() (путь получится: http://example.com/wp-content/themes/my-theme/my-theme-script.js.)
+
+
+
+{{NODEJS}}
+    /usr/bin/env: 'node': Permission denied
+        install and run node in dockerfile with apache (user www-data)
+        reinstalling node with package-manager (instead of NVM) resolve problem
+
+
+        &&
+        (NOT RESOLVE)
+            fix: 
+                in dir where run "npm run cmd" execute cmd
+                    $ chown -R root:root .
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////
+FRONTEND
+//////////////////////////////////////////////////////////////////////////////////
+
+
+[0]
+Ошибка полифилов Cannot read properties of undefined (reading 'call')
+https://stackoverflow.com/questions/70398678/i-tried-to-polyfill-modules-in-webpack-5-but-not-working-reactjs
+
+Необходимо установить в вебпак fallback:
+        fallback: {
+            stream: require.resolve('stream-browserify'),
+        },
+
+
+Если не подключается что-то, мб некорректный путь. Это связано с тем, что в webpack
+указан publicPath. Установил путь /. Таким образом главный js и html файлы лежат в папке,
+относительно которой должны располагаться другие папки
+
+***
+
+{{JS}}
+
+    SWIPER
+    - ошибка стилей с огромным слайдером: для родительского узла стили:
+        width: 100%;
+        max-width: 100%;
+        // max-height: 100vh;
+        min-height: 0;
+        min-width: 0;
+        :::
+        а также для вертикального слайдера - указывается автовысота
+    - не работают thumbs
+        вместо объявления из demo предлагается использовать:
+        let thumbsSwiper = ref(null)
+        function setThumbsSwiper (swiper) {
+            thumbsSwiper.value = swiper
+        }
+    - свайпер и не только. длина изображения с динамическим размером
+        задача width родительскому элемену важна - нужно проверить цепочку родителей
+        и задать длину каждому. (например, node <swiper></swiper>)
+
+    AXIOS
+    - Для отслеживания процесса загрузки используется:
+        config: {
+            onDownloadProgress: (progressEvent) => {
+                progressEvent.lengthComputable // Возможно ли отслеживать прогресс
+
+                let percentCompleted = Math.floor(
+                (progressEvent.loaded / progressEvent.total) * 100
+                );
+                console.log("load: ", percentCompleted);
+            }
+        }
+
+
+    {{Sticky-js}}
+
+        ошибка (low), связанная с некорректным отображением липкого элемента - проблема заключалась в 
+        некорректном body. который не занимал всю страницу
+
+        if{
+        если element.top === 0
+        }elseif{
+        если элемент должен активным, есть два сценария
+        элементу добавляется fixed
+        if{
+            логика для приклеенного элемента
+            работает, когда 
+            (
+            this.scrollTop + 
+            element.sticky.rect.height + 
+            element.sticky.marginTop
+            ) >
+            (
+            element.sticky.container.rect.top + 
+            element.sticky.container.offsetHeight -     /// высота элемента (body)
+            element.sticky.marginBottom
+            )
+        }else {
+            логика до элемента, который уперся
+        }
+        }else{
+        обнуление
+        }
+
+***
+
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+                                        DEV
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+
+
+---------------------------------------------------------------------------------------
+
+{{ WEBPACK }}
+    [0]
+        Ошибка связанная с путями файлов во vue
+        ! настройка webpack:
+
+            output: {
+                path: path.resolve(__dirname, 'assets/all'),
+                filename: 'index.bundle.js',
+                publicPath: '/',
+            },
+            devServer : {
+                static: path.join(__dirname, "./assets/all"),
+                historyApiFallback: {
+                    // index: 'assets/all/index.html'
+                    rewrites: [
+                    { from: /^\/.*/, to: 'index.html' },
+                    ],
+                },
+            }
+
+        пояснение:
+            используемый файл index.html, подключаемый к нему index.bundle.js 
+            в разработке также используются, при этом не записываясь на диск
+
+            использование путей возможно благодаря настройке вебпака,
+            в которой любые пути перенаправляются на главный файл index.html
+
+    [1]
+        {{prerender-spa-plugin}} 
+            [0]
+                ошибка:     [prerender-spa-plugin] Unable to prerender all routes!
+                            
+                причина:    оффициальная версия плагина пепрестала поддерживаться
+
+                решение:    использовать @dreysolano/prerender-spa-plugin || prerender-spa-plugin-next
+
+            [1]
+                наличие плагина определяет, каким будет index.html, который возвращает
+                HTMLWebpackPlugin - если сабж присутсвует, то содержимое узла #app
+                будет заполненным содержимым страницы с путём '/'
+
+            [2] ошибка, связанная с НЕзаполнением содержимого mount-элемента vue.
+                получалось вывести все необходимые пути-файлы, но содержимое #app
+                оказывалось пустым
+                createWebHistory()
+
+            [3] неразрешенная ошибка: 
+                плагин не работает если в компоненте присутвуют некоторые import,
+                например, импорт компонента, такая же ошибка возникает при импорте routes 
+
+
+        
+
+---------------------------------------------------------------------------------------
+
+[1]
+Проблема с Неотображением стилей в dev сборке. Конечным и КЛЮЧЕВЫМ решением было изменение sideEffect
+    ***
+    Возможные решения (ответ https://stackoverflow.com/questions/63770142/webpack-not-loading-vues-single-file-components-css)
+    в webpack.config.js
+    1) Добавить esModule: false к css-loader варианту. 
+    2) Изменить vue-style-loaderна style-loader в webpack.config.js. (как ответ @seiluv)
+    в пакете.json
+    3) Добавить "*.vue"в{sideEffects: []}
+    См.: https://github.com/vuejs/vuepress/issues/718#issuecomment-412345448 и https://stackoverflow.com/a/53737250/493168.
+    ***
+    1 и 2 решение не оказываеют особого влияния
+
+    SideEffect в false ВЫЗЫВАЕТ ЭТУ ПРОБЛЕМУ
+
+(.) - а так же - я убрал   "sideEffects": [
+                                "**/*.css"
+                            ],
+---------------------------------------------------------------------------------------
+
+[2]
+Подключение attach debug в Chrome
+
+Метод 1 (attach):
+    - Необходимо добавить флаги для Chrome открыть свойства и в Target (Объект) добавить флаги: 
+        chrome.exe --remote-debugging-port=9222 --user-data-dir=remote-profile
+    - Дописать свойство webRoot - в случае с Docker, когда корневой папкой является не тема, то прописывается путь "${workspaceFolder}/mounts/wp-content/themes/CustomTheme"
+    - Запустить Хром из этого ярлыка, открыть localhost:8080, включить отладку
+
+    & Linux:
+    /usr/share/applications/google-chrome.desktop
+        set "Exec "default path string etc" <MY-FLAGS>
+
+Метод 2 (launch):
+    - В файл launch.json для конфигурации launch добавить свойство "userDataDir": false
+    - Запустить новый экземпляр Chrome
+
+{{BROWSERS}}
+    redirect (301 from cache)
+    {{CROME}}
+            Редирект происходит из-за кеширования.
+            Лечится "~Очисткой файлов и изображения" в 
+            chrome://settings/clearBrowserData
+
+{{VSCODE}}
+    {{INTELLISENSE}}
+        1. check all settings
+
+        note: settings php.executablePath - binary file, work stable, next setting reset it setting
+        
+        (???) - not necessarily, if the above not working
+        path to PHP from Docker container
+        https://stackoverflow.com/questions/44501237/set-php-path-from-host-to-docker-container
+
+
+
+
+

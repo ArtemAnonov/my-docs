@@ -1,0 +1,35 @@
+{{ALL}}
+code <F>
+
+wget <LINK>                     load files
+
+
+
+{{DOKER}}
+docker stats [OPTIONS] [C...]
+docker exec -it <C> bash -l
+docker run -it <I> sh           - interactive shell container (if image his contain) https://stackoverflow.com/questions/44769315/how-to-see-docker-image-contents
+
+docker container ls 		    - list active containers - [options]
+
+{{NPM}}
+
+npm
+npm -y                          - set default
+
+
+{{VSCODE}}
+code . -r                       - open folder in current window
+
+{{WSL}}
+Комманды:
+    wsl -l -v                   Cписок дистрибутивов и их текущее состояние
+    wsl --shutdown              Выключить все
+    wsl -t <DistroName>         Завершить определенный дистрибутив
+    wsl                         Загрузите дистрибутив по умолчанию (отмечен *)
+    wsl -d <DistroName>         Загрузите определенный дистрибутив
+
+
+{{SSH}}
+ssh -tt                         - fix 
+

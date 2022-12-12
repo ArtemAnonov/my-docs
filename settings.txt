@@ -1,0 +1,59 @@
+"C:\Program Files\Google\Chrome\Application\chrome.exe" --profile-directory="Default" --remote-debugging-port=9222 --user-data-dir=remote-debug-profile --disable-web-security
+
+{{XDEBUG}}
+    1. check php info, {ctrl + c}
+    2. {ctrl + v} to xdebug.org
+    3. Настройка 
+
+    Also:
+        xdebug_info();      - show errors
+
+
+    P.S.
+        Xdebug that connects to IDE and NOT other way around
+
+            F5 - start debug, xdebug trying listen 
+                Order requests xdebug:
+                1. if xdebug.discover_client_host=true 
+                    - try connect with address found in the HTTP headers
+                2  else 
+                    - try to connect xdebug.client_host
+
+
+
+{{SFTP}}
+    {
+        "name": "My Server",
+        "host": "anashaer.beget.tech",
+        "protocol": "sftp",
+        "port": 22,
+        "username": "anashaer_ftp",
+        "password": "uZ1jg&kb",
+        "remotePath": "/home/a/anashaer/anashaer.beget.tech/public_html/",
+        "uploadOnSave": true,
+        "useTempFile": false,
+        "openSsh": true,
+        "concurrency": 1
+    }
+    Сначала не загружалась папка.
+    Действия сделанные перед тем как включился:
+     - включение ssh
+     - попытка нажать на Каталог My Server в сайдбаре
+
+{{MYSQL}}
+    Set in /etc/my.cnf after [mysqld] for reduce memory (RAM) size using (-40-60%)
+        performance_schema = 0
+
+
+{{BEGET}}
+    крипты на python, на вирт. хостинге возможно запустить только из виртуального окружения Docker, но т.к. для входа в docker требуется ввод пароля, нужно сначала пробросить в него ключ. Подключитесь на аккаунт по ssh. Затем выполните
+
+ssh-keygen -t rsa
+Нажимаем enter, пока ключ не будет сгенерирован. Пробрасываем его в докер командой
+
+ssh-copy-id '-p222 -i ~/.ssh/id_rsa.pub  localhost'
+Вводим свой пароль от аккаунта. Если все сделано верно, теперь вход в докер будет происходить без ввода пароля, проверьте выполнив команду ssh localhost -p222
+
+В задании для crontab, перед вводом нужной нам команды указываем ssh localhost -p222, например
+
+ssh localhost -p222 ~/.local/bin/python3 -V

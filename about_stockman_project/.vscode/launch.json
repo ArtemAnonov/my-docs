@@ -1,0 +1,38 @@
+{
+    // Используйте IntelliSense, чтобы узнать о возможных атрибутах.
+    // Наведите указатель мыши, чтобы просмотреть описания существующих атрибутов.
+    // Для получения дополнительной информации посетите: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "BACK",
+            "type": "php",
+            "request": "launch",
+            "hostname": "localhost",
+            "port": 9003,
+            "pathMappings": {
+                "/var/www/html/": "${workspaceFolder}/mounts/"
+            },
+            "ignore": [
+                "**/vendor/**/*.php"
+            ],
+            // "log": true,
+        },
+        {
+            "userDataDir": false,
+            "type": "pwa-chrome",
+            "request": "launch",
+            "name": "FRONT",
+            "url": "http://localhost:8080",
+            "urlFilter": "http://localhost:8080/*",
+            "webRoot": "${workspaceFolder}/mounts/wp-content/themes/CustomTheme"
+        },
+        {
+            "type": "chrome",
+            "request": "attach",
+            "name": "ATTACH",
+            "port": 9222,
+            "webRoot":  "${workspaceFolder}/mounts/wp-content/themes/CustomTheme"
+        }
+    ]
+}
